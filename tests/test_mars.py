@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mars import update_coords, will_rover_leave_grid, move_rover
+from mars import update_coords, will_rover_leave_grid, move_rover, get_rover_settings
 
 
 class TestUpdatingCoords(TestCase):
@@ -52,3 +52,11 @@ class TestControlRover(TestCase):
         grid_size = "4 8"
         expected = move_rover(grid_size, "FFLFRFF", "N", ["0", "2"])
         assert expected == "0, 4 W (Lost)"
+
+
+class TestRoverSettings(TestCase):
+    def test_get_rover_settings(self):
+        rover_desc = "(0, 2, N) FFLFRFF"
+        expected = get_rover_settings(rover_desc)
+        print(expected)
+        assert expected == ('FFLFRFF', ['0', '2'], 'N')

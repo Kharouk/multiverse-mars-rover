@@ -38,36 +38,13 @@ to explore the planet? Well, enter your name to
 start your adventure.
 """)
 
-quit_signals = ('q', 'Q', "quit", "exit")
-# name = input("What is your Name?\nSergeant ")
 
-# grid_size = input("Please enter the grid size (ex: 4 8):\n")
-# robots = []
-# while len(robots) != 3:
-#     robots.append(input("Please enter the rover details (ex: (2, 3, E) LFRFF):\n"))
-
-grid_size = "4 8"
-# rover_desc = "(2, 3, E) LFRFF"
-rover_desc = "(0, 2, N) FFLFRFF"
-
-rover_steps = rover_desc.split(") ")[1]  # LFRFF
-rover_coords = rover_desc[rover_desc.find("(") + 1:rover_desc.find(")")].split(', ')
-rover_direction = rover_coords[-1]  # E
-rover_coords = rover_coords[:2]  # [2,3]
-
-rotate_left = {
-    "E": "N",
-    "N": "W",
-    "W": "S",
-    "S": "E"
-}
-
-rotate_right = {
-    "E": "S",
-    "N": "E",
-    "W": "N",
-    "S": "W"
-}
+def get_rover_settings(rover):
+    steps = rover.split(") ")[1]  # LFRFF
+    _coords = rover[rover.find("(") + 1:rover.find(")")].split(', ')
+    direction = _coords[-1]  # E
+    coords = _coords[:2]  # [2,3]
+    return steps, coords, direction
 
 
 def will_rover_leave_grid(grid, coords, direction):
@@ -97,10 +74,24 @@ def update_coords(coords, direction):
     return coords
 
 
-# grid=[4, 8] ,steps=FFLFRF, direction=E, coords=["0", "1"]
 def move_rover(grid, steps, direction, coords):
+    """grid=[4, 8] ,steps=FFLFRF, direction=E, coords=["0", "1"]"""
+    rotate_left = {
+        "E": "N",
+        "N": "W",
+        "W": "S",
+        "S": "E"
+    }
+
+    rotate_right = {
+        "E": "S",
+        "N": "E",
+        "W": "N",
+        "S": "W"
+    }
     grid = grid.split(" ")
     is_lost = False
+
     for step in steps:
         if step == "L":
             direction = rotate_left[direction]
@@ -111,21 +102,28 @@ def move_rover(grid, steps, direction, coords):
                 is_lost = True
                 break
             coords = update_coords(coords, direction)
+
     result = f"{coords[0]}, {coords[1]} {direction}" + (" (Lost)" if is_lost else "")
     print(result)
     return result
 
 
-move_rover(grid_size, "FFFRFFFF", "N", ["0", "0"])
+quit_signals = ('q', 'Q', "quit", "exit")
+name = input("What is your Name?\nSergeant ")
+grid_size = input("Please enter the grid size (ex: 4 8):\n")
+rovers = []
+action = ""
+while action not in quit_signals:
+    action = input("Please enter the rover details exactly like so: (2, 3, E) LFRFF\nIf you'd like to stop " +
+                   "adding robots, please type 'q'\n")
+    if action not in quit_signals:
+        rovers.append(action)
 
-# for step in rover_steps:
-#     if step == "L":
-#         rover_direction = rotate_left[rover_direction]
-#     if step == "R":
-#         rover_direction = rotate_right[rover_direction]
-#     if step == "F":
-#         if will_rover_leave_grid(grid, rover_coords, rover_direction):
-#             break
-#         rover_coords = update_coords(rover_coords, rover_direction)
-#
-# print(f"{rover_coords[0]}, {rover_coords[1]} {rover_direction}")
+for rover in rovers:
+    rover_steps, rover_coords, rover_direction = get_rover_settings(rover)
+    move_rover(grid_size, rover_steps, rover_direction, rover_coords)
+
+print(f"\nBye Sergeant {name}!")
+# rover_desc = "(0, 2, N) FFLFRFF"
+# rover_steps, rover_coords, rover_direction = get_rover_settings(rover_desc)
+# move_rover(grid_size, "FFFRFFFF", "N", ["0", "0"])
